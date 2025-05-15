@@ -4,15 +4,13 @@
 
 AUTHOR_AVATAR_URL=$(curl -s https://api.github.com/users/$PR_AUTHOR | jq -r .avatar_url)
 
-if [[ "$PR_STATUS" == "closed" ]]; then
+if [[ "$IS_MERGED" == "true" ]]; then
   BADGE_STYLE="Attention"
-elif [[ "$IS_MERGED" == "true" ]]; then
+elif [[ "$PR_STATUS" == "closed" ]]; then
   BADGE_STYLE="Accent"
 else
   BADGE_STYLE="Good"
 fi
-
-
 
 cat <<EOF > payload.json
 {
@@ -55,6 +53,20 @@ cat <<EOF > payload.json
                                     "text": "**${REPO}**",
                                     "wrap": true,
                                     "color": "Good"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Column",
+                            "width": "auto",
+                            "items": [
+                                {
+                                    "type": "Badge",
+                                    "text": "${PR_STATUS}",
+                                    "size": "Large",
+                                    "style": "${BADGE_STYLE}",
+                                    "shape": "Rounded",
+                                    "appearance": "Tint"
                                 }
                             ]
                         }
@@ -107,72 +119,27 @@ cat <<EOF > payload.json
                             "items": [
                                 {
                                     "type": "TextBlock",
-                                    "text": "**Head:**",
+                                    "text": "**Head:** ${HEAD_REF}",
                                     "wrap": true,
                                     "spacing": "Small"
                                 },
                                 {
                                     "type": "TextBlock",
-                                    "text": "**Base:**",
+                                    "text": "**Base:** ${BASE_REF}",
                                     "wrap": true,
                                     "spacing": "Small"
                                 },
                                 {
                                     "type": "TextBlock",
-                                    "text": "**Files:**",
+                                    "text": "**Files:** ${CHANGED_FILES}",
                                     "wrap": true,
                                     "spacing": "Small"
                                 },
                                 {
                                     "type": "TextBlock",
-                                    "text": "**Changes**:",
+                                    "text": "**Changes**: 🟢 +${ADDITIONS} / 🔴 -${DELETIONS}",
                                     "wrap": true,
                                     "spacing": "Small"
-                                },
-                                {
-                                    "type": "TextBlock",
-                                    "text": "**Status**:",
-                                    "wrap": true,
-                                    "spacing": "Small"
-                                }
-                            ],
-                            "verticalContentAlignment": "Center"
-                        },
-                        {
-                            "type": "Column",
-                            "width": "auto",
-                            "items": [
-                                {
-                                    "type": "TextBlock",
-                                    "text": "${HEAD_REF}",
-                                    "wrap": true,
-                                    "spacing": "Small"
-                                },
-                                {
-                                    "type": "TextBlock",
-                                    "text": "${BASE_REF}",
-                                    "wrap": true,
-                                    "spacing": "Small"
-                                },
-                                {
-                                    "type": "TextBlock",
-                                    "text": "${CHANGED_FILES}",
-                                    "wrap": true,
-                                    "spacing": "Small"
-                                },
-                                {
-                                    "type": "TextBlock",
-                                    "text": "🟢 +${ADDITIONS} / 🔴 -${DELETIONS}",
-                                    "wrap": true,
-                                    "spacing": "Small"
-                                },
-                                {
-                                    "type": "Badge",
-                                    "text": "${PR_STATUS}",
-                                    "size": "Large",
-                                    "style": "${BADGE_STYLE}",
-                                    "shape": "Rounded",
-                                    "appearance": "Tint",
                                 }
                             ],
                             "verticalContentAlignment": "Center"
