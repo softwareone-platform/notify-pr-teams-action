@@ -19,7 +19,7 @@ This GitHub Action sends an Adaptive Card notification to a Microsoft Teams chan
 - name: Compute added/removed lines for notification
   id: diff
   run: |
-    PR_DATA=$(gh pr view "$PR_NUMBER" --json additions,deletions -q '.')
+    PR_DATA=$(gh pr view "${{ github.event.pull_request.number }}" --json additions,deletions -q '.')
     ADDITIONS=$(echo "$PR_DATA" | jq '.additions')
     DELETIONS=$(echo "$PR_DATA" | jq '.deletions')
     echo "additions=$ADDITIONS" >> $GITHUB_OUTPUT

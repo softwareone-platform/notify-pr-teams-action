@@ -35,7 +35,7 @@ cat <<EOF > payload.json
                             "items": [
                                 {
                                     "type": "Image",
-                                    "url": "https://adaptivecards.microsoft.com/$%7BBOT_IMAGE_URL%7D",
+                                    "url": "${BOT_IMAGE_URL}",
                                     "size": "Medium",
                                     "style": "RoundedCorners"
                                 }
@@ -77,7 +77,7 @@ cat <<EOF > payload.json
                             "items": [
                                 {
                                     "type": "Image",
-                                    "url": "https://adaptivecards.microsoft.com/%7BAUTHOR_AVATAR_URL%7D",
+                                    "url": "${AUTHOR_AVATAR_URL}",
                                     "size": "Small",
                                     "style": "Person"
                                 }
@@ -169,7 +169,7 @@ cat <<EOF > payload.json
                                 {
                                     "type": "Badge",
                                     "text": "${PR_STATUS}",
-                                    "size": "ExtraLarge",
+                                    "size": "Large",
                                     "style": "${BADGE_STYLE}",
                                     "shape": "Rounded",
                                     "appearance": "Tint",
@@ -198,6 +198,6 @@ cat <<EOF > payload.json
    ]
 }
 EOF
-
+cat payload.json
 curl -H "Content-Type: application/json" -d @payload.json "$WEBHOOK_URL"
         
