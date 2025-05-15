@@ -1,0 +1,69 @@
+name: Send Teams PR Notification
+description: Sends a pull request notification to Microsoft Teams.
+inputs:
+  webhook_url:
+    required: true
+    description: Teams incoming webhook URL
+  bot_image_url:
+    required: true
+    description: URL of the bot image to be used in the notification
+  repo:
+    required: true
+    description: Repository name in the format `owner/repo`
+  pr_url:
+    required: true
+    description: URL of the pull request
+  pr_title:
+    required: true
+    description: Title of the pull request
+  pr_author:
+    required: true
+    description: Author of the pull request
+  head_ref:
+    required: true
+    description: The head branch name of the pull request
+  base_ref:
+    required: true
+    description: The base branch name of the pull request
+  commits:
+    required: true
+    description: Number of commits in the pull request
+  changed_files:
+    required: true
+    description: Number of files changed in the pull request
+  additions:
+    required: true
+    description: Number of lines added in the pull request
+  deletions:
+    required: true
+    description: Number of lines deleted in the pull request
+  pr_number:
+    required: true
+    description: Pull request number
+  pr_status:
+    required: true
+    description: Status of the pull request
+  is_merged:
+    required: false
+    description: Whether the pull request is merged (true/false)
+runs:
+  using: "composite"
+  steps:
+    - run: bash ${{ github.action_path }}/notify.sh
+      shell: bash
+      env:
+        WEBHOOK_URL: ${{ inputs.webhook_url }}
+        BOT_IMAGE_URL: ${{ inputs.bot_image_url }}
+        REPO: ${{ inputs.repo }}
+        PR_URL: ${{ inputs.pr_url }}
+        PR_TITLE: ${{ inputs.pr_title }}
+        PR_AUTHOR: ${{ inputs.pr_author }}
+        HEAD_REF: ${{ inputs.head_ref }}
+        BASE_REF: ${{ inputs.base_ref }}
+        COMMITS: ${{ inputs.commits }}
+        CHANGED_FILES: ${{ inputs.changed_files }}
+        ADDITIONS: ${{ inputs.additions }}
+        DELETIONS: ${{ inputs.deletions }}
+        PR_NUMBER: ${{ inputs.pr_number }}
+        PR_STATUS: ${{ inputs.pr_status }}
+        IS_MERGED: ${{ inputs.is_merged }}

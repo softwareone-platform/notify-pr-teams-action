@@ -1,0 +1,203 @@
+#!/bin/bash
+# This script sends a notification to a Microsoft Teams channel when a pull request is created or updated.
+# It uses the Microsoft Teams webhook URL provided as an environment variable.
+
+AUTHOR_AVATAR_URL=$(curl -s https://api.github.com/users/$PR_AUTHOR | jq -r .avatar_url)
+
+if [[ "$PR_STATUS" == "closed" ]]; then
+  BADGE_STYLE="Attention"
+elif [[ "$IS_MERGED" == "true" ]]; then
+  BADGE_STYLE="Accent"
+else
+  BADGE_STYLE="Good"
+fi
+
+
+
+cat <<EOF > payload.json
+{
+   "type":"message",
+   "attachments":[
+      {
+         "contentType":"application/vnd.microsoft.card.adaptive",
+         "content":{
+            "\$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
+            "speak": "New pull request opened",
+            "type": "AdaptiveCard",
+            "version": "1.5",
+            "body": [
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "auto",
+                            "items": [
+                                {
+                                    "type": "Image",
+                                    "url": "https://adaptivecards.microsoft.com/$%7BBOT_IMAGE_URL%7D",
+                                    "size": "Medium",
+                                    "style": "RoundedCorners"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "**Pull Request Notifier**",
+                                    "wrap": true
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "**${REPO}**",
+                                    "wrap": true,
+                                    "color": "Good"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "#${PR_NUMBER} - ${PR_TITLE}",
+                    "wrap": true,
+                    "size": "ExtraLarge",
+                    "weight": "Bolder",
+                    "color": "Accent"
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "auto",
+                            "items": [
+                                {
+                                    "type": "Image",
+                                    "url": "https://adaptivecards.microsoft.com/%7BAUTHOR_AVATAR_URL%7D",
+                                    "size": "Small",
+                                    "style": "Person"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "Column",
+                            "width": "stretch",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "**${PR_AUTHOR}** wants to merge **${COMMITS}** commits",
+                                    "size": "Large",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "width": "auto",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "**Head:**",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "**Base:**",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "**Files:**",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "**Changes**:",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "**Status**:",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                }
+                            ],
+                            "verticalContentAlignment": "Center"
+                        },
+                        {
+                            "type": "Column",
+                            "width": "auto",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text": "${HEAD_REF}",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "${BASE_REF}",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "${CHANGED_FILES}",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "text": "🟢 +${ADDITIONS} / 🔴 -${DELETIONS}",
+                                    "wrap": true,
+                                    "spacing": "Small"
+                                },
+                                {
+                                    "type": "Badge",
+                                    "text": "${PR_STATUS}",
+                                    "size": "ExtraLarge",
+                                    "style": "${BADGE_STYLE}",
+                                    "shape": "Rounded",
+                                    "appearance": "Tint",
+                                }
+                            ],
+                            "verticalContentAlignment": "Center"
+                        }
+                    ]
+                }
+            ],
+            "msteams": {
+                "width": "full"
+            },
+            "actions": [
+                {
+                    "type": "Action.OpenUrl",
+                    "title": "View pull request",
+                    "url": "${PR_URL}"
+                }
+            ],
+            "msTeams": {
+                "width": "full"
+            }
+        }
+      }
+   ]
+}
+EOF
+
+curl -H "Content-Type: application/json" -d @payload.json "$WEBHOOK_URL"
+        
