@@ -5,9 +5,9 @@
 AUTHOR_AVATAR_URL=$(curl -s https://api.github.com/users/$PR_AUTHOR | jq -r .avatar_url)
 
 if [[ "$IS_MERGED" == "true" ]]; then
-  BADGE_STYLE="Attention"
-elif [[ "$PR_STATUS" == "closed" ]]; then
   BADGE_STYLE="Accent"
+elif [[ "$PR_STATUS" == "closed" ]]; then
+  BADGE_STYLE="Attention"
 else
   BADGE_STYLE="Good"
 fi
