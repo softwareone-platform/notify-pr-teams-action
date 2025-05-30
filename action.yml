@@ -47,24 +47,21 @@ inputs:
     required: true
     description: Whether the pull request is merged (true/false)
 runs:
-  using: "composite"
-  steps:
-
-    - run: bash ${{ github.action_path }}/notify.sh
-      shell: bash
-      env:
-        WEBHOOK_URL: ${{ inputs.webhook_url }}
-        BOT_IMAGE_URL: ${{ inputs.bot_image_url }}
-        REPO: ${{ inputs.repo }}
-        PR_URL: ${{ inputs.pr_url }}
-        PR_TITLE: ${{ inputs.pr_title }}
-        PR_AUTHOR: ${{ inputs.pr_author }}
-        HEAD_REF: ${{ inputs.head_ref }}
-        BASE_REF: ${{ inputs.base_ref }}
-        COMMITS: ${{ inputs.commits }}
-        CHANGED_FILES: ${{ inputs.changed_files }}
-        ADDITIONS: ${{ inputs.additions }}
-        DELETIONS: ${{ inputs.deletions }}
-        PR_NUMBER: ${{ inputs.pr_number }}
-        PR_STATUS: ${{ inputs.pr_status }}
-        IS_MERGED: ${{ inputs.is_merged }}
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    WEBHOOK_URL: ${{ inputs.webhook_url }}
+    BOT_IMAGE_URL: ${{ inputs.bot_image_url }}
+    REPO: ${{ inputs.repo }}
+    PR_URL: ${{ inputs.pr_url }}
+    PR_TITLE: ${{ inputs.pr_title }}
+    PR_AUTHOR: ${{ inputs.pr_author }}
+    HEAD_REF: ${{ inputs.head_ref }}
+    BASE_REF: ${{ inputs.base_ref }}
+    COMMITS: ${{ inputs.commits }}
+    CHANGED_FILES: ${{ inputs.changed_files }}
+    ADDITIONS: ${{ inputs.additions }}
+    DELETIONS: ${{ inputs.deletions }}
+    PR_NUMBER: ${{ inputs.pr_number }}
+    PR_STATUS: ${{ inputs.pr_status }}
+    IS_MERGED: ${{ inputs.is_merged }}
